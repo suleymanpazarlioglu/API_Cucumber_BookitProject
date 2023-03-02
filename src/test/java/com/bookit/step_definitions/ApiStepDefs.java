@@ -13,6 +13,7 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.Assert;
+import org.openqa.selenium.json.Json;
 
 import java.util.Map;
 
@@ -21,34 +22,30 @@ import static io.restassured.RestAssured.*;
 public class ApiStepDefs {
     String token;
     Response response;
+
     String emailGlobal;
     String studentEmail;
     String studentPassword;
 
     @Given("I logged Bookit api using {string} and {string}")
     public void i_logged_Bookit_api_using_and(String email, String password) {
-
-        token = BookItApiUtil.generateToken(email,password);
-        emailGlobal = email;
+        token=BookItApiUtil.generateToken(email,password);
+        emailGlobal=email;
     }
 
     @When("I get the current user information from api")
     public void i_get_the_current_user_information_from_api() {
+
         System.out.println("token = " + token);
 
-        //send a GET request "/api/users/me" endpoint to get current user info
-
-         response = given().accept(ContentType.JSON)
-                .and()
-                .header("Authorization", token)
-                .when()
-                .get(Environment.BASE_URL + "/api/users/me");
+        response=given().accept(ContentType.JSON)
+                .and().header("Authorization",token)
+                .when().get(ConfigurationReader.get("base_url")+"/api/users/me");
 
     }
 
     @Then("status code should be {int}")
     public void status_code_should_be(int statusCode) {
-        //verify status code matches with the feature file expected status code
         Assert.assertEquals(statusCode,response.statusCode());
 
     }
@@ -112,7 +109,7 @@ public class ApiStepDefs {
         System.out.println("actualUIName = " + actualUIName);
         System.out.println("actualUIRole = " + actualUIRole);
 
-         //UI vs DB
+        //UI vs DB
         String expectedFullName = expectedFirstName+" "+expectedLastName;
         //verify ui fullname vs db fullname
         Assert.assertEquals(expectedFullName,actualUIName);
@@ -127,7 +124,6 @@ public class ApiStepDefs {
         Assert.assertEquals(actualRole,actualUIRole);
 
     }
-
     @When("I send POST request to {string} endpoint with following information")
     public void i_send_POST_request_to_endpoint_with_following_information(String path, Map<String,String> studentInfo) {
         //why we prefer to get information as a map from feature file ?
@@ -144,7 +140,7 @@ public class ApiStepDefs {
                 .log().all()
                 .when()
                 .post(Environment.BASE_URL + path)
-        .then().log().all().extract().response();        ;
+                .then().log().all().extract().response();        ;
 
 
     }
@@ -157,6 +153,8 @@ public class ApiStepDefs {
 
     @Given("I logged Bookit api as {string}")
     public void iLoggedBookitApiAs(String role) {
-       token= BookItApiUtil.getTokenByRole(role);
+        token= BookItApiUtil.getTokenByRole(role);
     }
+
+
 }
